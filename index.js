@@ -1,68 +1,152 @@
 // index.js
 
 // 1. IMPORT LIBRARIES
-// =================================================================
 const express = require('express');
 const cors = require('cors');
-// NEW: Import the Google AI SDK
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-// NEW: Import and configure dotenv to read our .env file
 require('dotenv').config();
 
-
 // 2. INITIALIZE THE APP
-// =================================================================
 const app = express();
 const PORT = 8000;
 
-
 // 3. CONFIGURE THE AI MODEL
-// =================================================================
-// Get the API key from our .env file
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-// Specify the model we want to use
 const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-
 // 4. APPLY MIDDLEWARE
-// =================================================================
 app.use(cors());
 app.use(express.json());
 
-
 // 5. DEFINE THE API ENDPOINT (THE ROUTE)
-// =================================================================
 app.post('/api/chat', async (req, res) => {
   try {
     const userMessage = req.body.message;
     console.log('Received message:', userMessage);
 
-    // --- This is the core of the "Brain" ---
-    // 1. The Knowledge Base: This is all the information you want the chatbot to know.
-    //    It ONLY uses this information to answer questions.
+    // This is the AI's "brain" with all your personal data.
     const knowledgeBase = `
-      My name is Jaden. I am a rising junior majoring in Computer Engineering with a minor in Buisness Administration. I am from
-      I study at [Your University] and my expected graduation is [Date].
-      My key skills include:
-      - Programming Languages: Python, C++, JavaScript
-      - Frameworks: React, Next.js, Node.js, Express.js
-      - Tools: Git, GitHub, Docker, VS Code
-      - Key Courses: Data Structures & Algorithms, Computer Architecture, Operating Systems.
-      Project Experience:
-      - Project 1: Built this AI-powered portfolio chatbot using the MERN stack (MongoDB, Express, React, Node.js) and the Google Gemini API.
-      - Project 2: Developed a home automation system using a Raspberry Pi and Python.
-      Contact Information:
-      - Email: [jsulaimantx@gmail.com]
-      - LinkedIn: [your-linkedin-url]
-      - GitHub: [your-github-url]
+      ---
+      ABOUT ME:
+      - My name is Jaden Sulaiman. I am an Aspiring Engineer with a Passion for Software and Hardware.
+      - I was born on March 31, 2005
+      - I am a student at The University of Texas at San Antonio (UTSA).
+      - The UTSA college I attend is the KLEBER College of Engineering and Integrated Design.
+      - My major is Computer Engineering and my minor is in Business Administration.
+      - I am from Houston, Texas.
+      - I currently live in San Antonio, Texas.
+      - My expected graduation date is May 2027.
+      - I am  a rising junior in college.
+      - I have a strong interest in software engineering, hardware engineering, and AI.
+      - I am passionate about [mention a passion, e.g., creating elegant solutions to complex problems].
+      - I am currently seeking Computer Engineer and Software Engineer roles for Summer 2026.
+      - I am an entreprenaur I founded JTF Studios, a Media Agency , in 2024.
+      - JTF STUDIOS is a media agency that specializes in photography, videography, and digital marketing services.
+      - I love to go to the gym and work out.
+      - I do day trading and I am a big fan of the stock market.
+      - I love to listen to lots of music 
+      - I love to travel and explore new places.
+      - I love food and trying new cuisines.
+      - I am a big fan of technology and always stay updated with the latest trends.
+      - I am a lifelong learner and enjoy taking on new challenges.
+      - I am a creative thinker and enjoy brainstorming innovative ideas.
+      - I am a team player and enjoy collaborating with others to achieve common goals.
+      - I am a Christian and I am involved in my church community.
+
+
+
+      PROFESSIONAL & CREATIVE LINKS:
+      - My LinkedIn Profile: https://www.linkedin.com/in/jadensulaiman
+      - My GitHub Profile: https://github.com/jadenS123
+      - My Photography Page: https://www.jtfstudios.com
+      
+      CONTACT INFORMATION:
+      - The best email to reach me at is: jsulaimantx@gmail.com
+      - My phone number is: (346) 445-1334.
+
+      SKILLS:
+      - Programming Languages: TypeScript, JavaScript, Python, C/C++, MATLAB
+      - Frameworks & Libraries: React, Next.js, Node.js, Express.js
+      - Web Development: Frontend and Backend Development, RESTful APIs
+      - Tools & Platforms: Git, GitHub, Docker, Vercel, Railway
+      - Hardware Engineering: Circuit Designm Digital Logic Design
+      - AI & Machine Learning: Familiar with AI concepts and APIs, including Google Gemini API
+      - CS Fundamentals: Data Structures, Algorithms, Object-Oriented Programming
+      - Database Management: Basic knowledge of SQL and NoSQL databases
+      - Operating Systems: Windows, macOS
+      - Cloud Services: Familiar with AWS and cloud deployment
+      - Soft Skills: Strong problem-solving abilities, effective team collaboration, and excellent communication skills.
+
+      PROFFESIONAL EXPERIENCE:
+      - The University of Texas at San Antonio (UTSA):
+        - Position: Student Assistant
+        - Duration: Septmeber 2023 - December 2023
+        - Responsibilities:
+          - Streamlined support processes using the ServiceNow platform, managing a weekly volume of 50+ inquiries to improve department efficiency and response times. 
+          - Ensured 100% data integrity for all entries by generating and reviewing detailed queries, maintaining consistency across department records. 
+          - Overhauled the department's email management system, resulting in more reliable follow-up and a more organized communication workflow.
+      - Tennis Express:
+        - Position: Logistics Operations Assistant
+        - Duration: May 2022 - AUgust 2023
+        - Responsibilities:
+          - Optimized the inventory workflow for incoming and outgoing goods by leveraging inventory control systems, significantly improving stock accuracy. 
+          - Engineered more efficient shipping and receiving processes that reduced package handling time and maintained high operational throughput
+          - Implemented a new systematic organization strategy for warehouse storage, leading to faster order fulfillment and fewer picking errors.
+      - Harris County Disctrict Clerk's Office:
+        - Position: Electronic Support Specialist
+        - Duration: October 2022 - Novemeber 2022
+        - Responsibilities:
+          - Served as a key technical resource for court staff, troubleshooting and resolving issues with electronic filing systems to ensure critical operational continuity. 
+          - Upheld strict data integrity and security protocols within the court's official records management system, safeguarding sensitive information. 
+          - Collaborated with legal staff to re-engineer document handling workflows, which improved filing efficiency and reduced procedural errors.
+
+      PROJECT EXPERIENCE:
+      - Personal AI Chatbot:
+          - Architected and deployed a full-stack, AI-powered chatbot to serve as a dynamic, interactive resume, allowing recruiters to retrieve my qualifications via natural language conversations. 
+          - Constructed a scalable and efficient backend using Node.js and Express.js, featuring a secure RESTful API that serves as the communication bridge between the user interface and the Google AI service. 
+          - Leveraged the Google Generative AI (Gemini) SDK to drive the chatbot's core logic, meticulously crafting the AI's knowledge base and persona to ensure accurate and personalized responses. 
+          - Developed a performant, server-rendered front-end with Next.js and TypeScript, creating a seamless user interface that prioritizes fast load times and a fluid conversational experience.
+
+      - Forage JP Morgan Software Engineering Virtual Experience:
+          - Configured a complete Python development environment using Git and data analysis libraries to establish a professional-grade workflow. 
+          - Developed Python scripts to process and analyze real-time financial data streams, preparing raw data for effective visualization. 
+          - Implemented a live data visualization graph using JPMorgan Chase’s proprietary ‘Perspective’ library, creating a user-friendly interface for traders to monitor real-time stock prices.
+
+    LEADERSHIP IVOLVMENT EXPERIENCE & ACTIVITIES:
+      - Color Stack Active Member:
+        - Actively participate in a national community dedicated to increasing the number of Black and Latinx computer science graduates.
+        - Engage in technical workshops, career-readiness events, and networking opportunities with professionals from leading tech companies.
+      - National Society of Black Engineers (NSBE) Active Member:
+        - Collaborated with a diverse group of peers on engineering-related initiatives, enhancing teamwork and problem-solving skills.
+        - Participated in professional development workshops, gaining industry insights and networking with engineering professionals.
+    
+    CLUBS & ORGANIZATIONS:
+      - National Society of Black Engineers (NSBE):
+        - Collaborated with a diverse group of peers on engineering-related initiatives, enhancing teamwork and problem-solving skills.
+        - Participated in professional development workshops, gaining industry insights and networking with engineering professionals.
+      - Student of Valor (SOV):
+        - Christian student organization at UTSA focused on spiritual growth, fellowship, and leadership development. The group meets regularly for Bible studies, worship sessions, and community outreach events, creating a supportive space for students to grow in their faith and live with purpose on campus.
+        - Engaged in community service projects, fostering a sense of social responsibility and leadership.
+        - Participated in workshops and events focused on personal development and community engagement.
+      - Arican Student Association (ASA):
+        - Celebrated and promoted African culture through events and activities, enhancing cultural awareness and diversity.
+        - Collaborated with peers to organize cultural events, fostering a sense of community and inclusivity.
+        - Participated in discussions and workshops on African heritage, promoting cultural understanding and appreciation.
+
+
+      RESUME:
+      - My resume can be downloaded directly from this link: https://drive.google.com/file/d/1YqHj17tce4nkl1tsocrd23AoPxGCd-GG/view?usp=sharing
+      ---
     `;
 
-    // 2. The Prompt: We combine the knowledge base with instructions and the user's question.
+    // === UPDATED PROMPT WITH NEW PERSONALITY INSTRUCTIONS ===
     const prompt = `
-      You are a professional, helpful chatbot for Jaden's portfolio website.
-      Your sole purpose is to answer questions from recruiters based ONLY on the information provided in the following KNOWLEDGE BASE.
-      Do not make anything up. If a question is asked that cannot be answered with the provided information,
-      politely say "I don't have that information, but you can contact Jaden directly at [your-email@example.com]."
+      You are a friendly, yet professional chatbot assistant for Jaden Sulaiman's portfolio. Your name is 'Jaden's Assistant' and your tone should be welcoming, helpful, and approachable.
+      Start your answers with positive and encouraging phrases when it feels natural, like "Of course!" or "I can certainly help with that."
+      Your sole purpose is to answer questions from recruiters based ONLY on the information provided in the KNOWLEDGE BASE.
+      Do not make anything up or infer information not present.
+      If a question is asked that cannot be answered with the provided information, use this exact response: "That's an excellent question. While I don't have the details on that specific topic, you can contact Jaden directly at jsulaimantx@gmail.com to learn more."
+      When you provide a link for a profile or resume, make sure it is the full, clickable URL.
 
       KNOWLEDGE BASE:
       ---
@@ -73,7 +157,7 @@ app.post('/api/chat', async (req, res) => {
 
       YOUR ANSWER:`;
 
-    // 3. Generate the response
+    // Generate the response from the AI
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const responseText = response.text();
@@ -89,9 +173,7 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
-
 // 6. START THE SERVER
-// =================================================================
 app.listen(PORT, () => {
   console.log(`✅ AI-powered server is running on http://localhost:${PORT}`);
 });
