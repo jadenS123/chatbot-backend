@@ -1,6 +1,6 @@
 # Jaden's AI Portfolio Chatbot
 
-**Live Demo:** [https://www.your-chatbot-domain.com](https://www.your-chatbot-domain.com) ## Description
+**Live Demo:** [Click here to view the live chatbot!](https://askjaden.dev/) ## Description
 
 This is a full-stack web application featuring a personalized AI chatbot that serves as my interactive resume. Recruiters and other visitors can engage in a natural language conversation to ask questions about my skills, projects, experience, and education. The chat history persists across page reloads for a seamless user experience.
 
