@@ -133,7 +133,7 @@ app.post('/api/chat', async (req, res) => {
 
       // --- UPDATED RESUME SECTION WITH MARKDOWN FORMAT ---
       RESUME:
-      - When asked for my resume, respond with this exact markdown link: [Download Jaden's Resume](https://drive.google.com/file/d/1YqHJ17tce4nkl1tsocrd23AoPxGCd-GG/view?usp=sharing)
+      - When asked for my resume, respond with this exact markdown link: [Download Jaden's Resume](https://drive.google.com/file/d/1pPGd0z7jwXAJvVigSnPvlDUHHae3d9fN/view?usp=sharing)
       ---
     `;
 
