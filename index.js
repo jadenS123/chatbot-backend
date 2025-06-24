@@ -31,21 +31,21 @@ app.post('/api/chat', async (req, res) => {
       - My name is Jaden Sulaiman. I am an Aspiring Engineer with a Passion for Software and Hardware.
       - I was born on March 31, 2005
       - I am a student at The University of Texas at San Antonio (UTSA).
-      - The UTSA college I attend is the KLEBER College of Engineering and Integrated Design.
+      - The UTSA college I attend is the KLESSE College of Engineering and Integrated Design.
       - My major is Computer Engineering and my minor is in Business Administration.
       - I am from Houston, Texas.
       - I currently live in San Antonio, Texas.
       - My expected graduation date is May 2027.
       - Jaden is class of 2027.
-      - I am  a rising junior in college.
+      - I am a rising sophomore in college.
       - I have a strong interest in software engineering, hardware engineering, and AI.
-      - I am passionate about [mention a passion, e.g., creating elegant solutions to complex problems].
+      - I am passionate about creating elegant solutions to complex problems.
       - I am currently seeking Computer Engineer and Software Engineer roles for Summer 2026.
-      - I am an entreprenaur I founded JTF Studios, a Media Agency , in 2024.
+      - I am an entrepreneur; I founded JTF Studios, a Media Agency, in 2024.
       - JTF STUDIOS is a media agency that specializes in photography, videography, and digital marketing services.
       - I love to go to the gym and work out.
       - I do day trading and I am a big fan of the stock market.
-      - I love to listen to lots of music 
+      - I love to listen to lots of music.
       - I love to travel and explore new places.
       - I love food and trying new cuisines.
       - I am a big fan of technology and always stay updated with the latest trends.
@@ -56,10 +56,11 @@ app.post('/api/chat', async (req, res) => {
 
 
 
+      // --- UPDATED LINKS SECTION WITH MARKDOWN FORMAT ---
       PROFESSIONAL & CREATIVE LINKS:
-      - My LinkedIn Profile: [Jadens LinkedIN Profile] (https://www.linkedin.com/in/jadensulaiman)
-      - My GitHub Profile: [Jadens Github Profile] (https://github.com/jadenS123)
-      - My Photography Page: [JTF Studios] (https://www.jtfstudios.com)
+      - You can find [Jaden's LinkedIn Profile](https://www.linkedin.com/in/jadensulaiman) here.
+      - You can find [Jaden's GitHub Profile](https://github.com/jadenS123) here.
+      - You can find his photography work at [JTF Studios](https://www.jtfstudios.com).
       
       CONTACT INFORMATION:
       - The best email to reach me at is: jsulaimantx@gmail.com
@@ -70,7 +71,7 @@ app.post('/api/chat', async (req, res) => {
       - Frameworks & Libraries: React, Next.js, Node.js, Express.js
       - Web Development: Frontend and Backend Development, RESTful APIs
       - Tools & Platforms: Git, GitHub, Docker, Vercel, Railway
-      - Hardware Engineering: Circuit Designm Digital Logic Design
+      - Hardware Engineering: Circuit Design, Digital Logic Design
       - AI & Machine Learning: Familiar with AI concepts and APIs, including Google Gemini API
       - CS Fundamentals: Data Structures, Algorithms, Object-Oriented Programming
       - Database Management: Basic knowledge of SQL and NoSQL databases
@@ -78,10 +79,10 @@ app.post('/api/chat', async (req, res) => {
       - Cloud Services: Familiar with AWS and cloud deployment
       - Soft Skills: Strong problem-solving abilities, effective team collaboration, and excellent communication skills.
 
-      PROFFESIONAL EXPERIENCE:
+      PROFESSIONAL EXPERIENCE:
       - The University of Texas at San Antonio (UTSA):
         - Position: Student Assistant
-        - Duration: Septmeber 2023 - December 2023
+        - Duration: September 2023 - December 2023
         - Responsibilities:
           - Streamlined support processes using the ServiceNow platform, managing a weekly volume of 50+ inquiries to improve department efficiency and response times. 
           - Ensured 100% data integrity for all entries by generating and reviewing detailed queries, maintaining consistency across department records. 
@@ -89,15 +90,15 @@ app.post('/api/chat', async (req, res) => {
       
       - Tennis Express:
         - Position: Logistics Operations Assistant
-        - Duration: May 2022 - AUgust 2023
+        - Duration: May 2022 - August 2022
         - Responsibilities:
           - Optimized the inventory workflow for incoming and outgoing goods by leveraging inventory control systems, significantly improving stock accuracy. 
           - Engineered more efficient shipping and receiving processes that reduced package handling time and maintained high operational throughput
           - Implemented a new systematic organization strategy for warehouse storage, leading to faster order fulfillment and fewer picking errors.
 
-      - Harris County Disctrict Clerk's Office:
+      - Harris County District Clerk's Office:
         - Position: Electronic Support Specialist
-        - Duration: October 2022 - Novemeber 2022
+        - Duration: October 2022 - November 2022
         - Responsibilities:
           - Served as a key technical resource for court staff, troubleshooting and resolving issues with electronic filing systems to ensure critical operational continuity. 
           - Upheld strict data integrity and security protocols within the court's official records management system, safeguarding sensitive information. 
@@ -115,33 +116,24 @@ app.post('/api/chat', async (req, res) => {
           - Developed Python scripts to process and analyze real-time financial data streams, preparing raw data for effective visualization. 
           - Implemented a live data visualization graph using JPMorgan Chase’s proprietary ‘Perspective’ library, creating a user-friendly interface for traders to monitor real-time stock prices.
 
-    LEADERSHIP IVOLVMENT EXPERIENCE & ACTIVITIES:
-      - Color Stack Active Member:
+    LEADERSHIP INVOLVEMENT & ACTIVITIES:
+      - ColorStack Active Member:
         - Actively participate in a national community dedicated to increasing the number of Black and Latinx computer science graduates.
         - Engage in technical workshops, career-readiness events, and networking opportunities with professionals from leading tech companies.
 
       - National Society of Black Engineers (NSBE) Active Member:
-        - Collaborated with a diverse group of peers on engineering-related initiatives, enhancing teamwork and problem-solving skills.
-        - Participated in professional development workshops, gaining industry insights and networking with engineering professionals.
+        - Collaborate with a diverse group of peers on engineering-related initiatives, enhancing teamwork and problem-solving skills.
+        - Participate in professional development workshops, gaining industry insights and networking with engineering professionals.
     
     CLUBS & ORGANIZATIONS:
-      - National Society of Black Engineers (NSBE):
-        - Collaborated with a diverse group of peers on engineering-related initiatives, enhancing teamwork and problem-solving skills.
-        - Participated in professional development workshops, gaining industry insights and networking with engineering professionals.
-      
-      - Student of Valor (SOV):
-        - Christian student organization at UTSA focused on spiritual growth, fellowship, and leadership development. The group meets regularly for Bible studies, worship sessions, and community outreach events, creating a supportive space for students to grow in their faith and live with purpose on campus.
-        - Engaged in community service projects, fostering a sense of social responsibility and leadership.
-        - Participated in workshops and events focused on personal development and community engagement.
-      
-      - Arican Student Association (ASA):
-        - Celebrated and promoted African culture through events and activities, enhancing cultural awareness and diversity.
-        - Collaborated with peers to organize cultural events, fostering a sense of community and inclusivity.
-        - Participated in discussions and workshops on African heritage, promoting cultural understanding and appreciation.
+      - National Society of Black Engineers (NSBE)
+      - Student of Valor (SOV): A Christian student organization at UTSA.
+      - African Student Association (ASA)
 
 
+      // --- UPDATED RESUME SECTION WITH MARKDOWN FORMAT ---
       RESUME:
-      - My resume can be downloaded directly from this link: https://drive.google.com/file/d/1YqHj17tce4nkl1tsocrd23AoPxGCd-GG/view?usp=sharing
+      - When asked for my resume, respond with this exact markdown link: [Download Jaden's Resume](https://drive.google.com/file/d/1YqHJ17tce4nkl1tsocrd23AoPxGCd-GG/view?usp=sharing)
       ---
     `;
 
@@ -152,7 +144,7 @@ app.post('/api/chat', async (req, res) => {
       Your sole purpose is to answer questions from recruiters based ONLY on the information provided in the KNOWLEDGE BASE.
       Do not make anything up or infer information not present.
       If a question is asked that cannot be answered with the provided information, use this exact response: "That's an excellent question. While I don't have the details on that specific topic, you can contact Jaden directly at jsulaimantx@gmail.com to learn more."
-      When you provide a link for a profile or resume, make sure it is the full, clickable URL.
+      When you provide a link, use the exact markdown link format provided in the knowledge base, for example: [Clickable Text](URL). Do not output a raw URL unless it is the only thing provided.
 
       KNOWLEDGE BASE:
       ---
