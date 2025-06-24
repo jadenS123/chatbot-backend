@@ -36,6 +36,7 @@ app.post('/api/chat', async (req, res) => {
       - I am from Houston, Texas.
       - I currently live in San Antonio, Texas.
       - My expected graduation date is May 2027.
+      - Jaden is class of 2027.
       - I am  a rising junior in college.
       - I have a strong interest in software engineering, hardware engineering, and AI.
       - I am passionate about [mention a passion, e.g., creating elegant solutions to complex problems].
@@ -56,9 +57,9 @@ app.post('/api/chat', async (req, res) => {
 
 
       PROFESSIONAL & CREATIVE LINKS:
-      - My LinkedIn Profile: https://www.linkedin.com/in/jadensulaiman
-      - My GitHub Profile: https://github.com/jadenS123
-      - My Photography Page: https://www.jtfstudios.com
+      - My LinkedIn Profile: [Jadens LinkedIN Profile] (https://www.linkedin.com/in/jadensulaiman)
+      - My GitHub Profile: [Jadens Github Profile] (https://github.com/jadenS123)
+      - My Photography Page: [JTF Studios] (https://www.jtfstudios.com)
       
       CONTACT INFORMATION:
       - The best email to reach me at is: jsulaimantx@gmail.com
@@ -84,7 +85,8 @@ app.post('/api/chat', async (req, res) => {
         - Responsibilities:
           - Streamlined support processes using the ServiceNow platform, managing a weekly volume of 50+ inquiries to improve department efficiency and response times. 
           - Ensured 100% data integrity for all entries by generating and reviewing detailed queries, maintaining consistency across department records. 
-          - Overhauled the department's email management system, resulting in more reliable follow-up and a more organized communication workflow.
+         - Overhauled the department's email management system, resulting in more reliable follow-up and a more organized communication workflow.
+      
       - Tennis Express:
         - Position: Logistics Operations Assistant
         - Duration: May 2022 - AUgust 2023
@@ -92,6 +94,7 @@ app.post('/api/chat', async (req, res) => {
           - Optimized the inventory workflow for incoming and outgoing goods by leveraging inventory control systems, significantly improving stock accuracy. 
           - Engineered more efficient shipping and receiving processes that reduced package handling time and maintained high operational throughput
           - Implemented a new systematic organization strategy for warehouse storage, leading to faster order fulfillment and fewer picking errors.
+
       - Harris County Disctrict Clerk's Office:
         - Position: Electronic Support Specialist
         - Duration: October 2022 - Novemeber 2022
@@ -116,6 +119,7 @@ app.post('/api/chat', async (req, res) => {
       - Color Stack Active Member:
         - Actively participate in a national community dedicated to increasing the number of Black and Latinx computer science graduates.
         - Engage in technical workshops, career-readiness events, and networking opportunities with professionals from leading tech companies.
+
       - National Society of Black Engineers (NSBE) Active Member:
         - Collaborated with a diverse group of peers on engineering-related initiatives, enhancing teamwork and problem-solving skills.
         - Participated in professional development workshops, gaining industry insights and networking with engineering professionals.
@@ -124,10 +128,12 @@ app.post('/api/chat', async (req, res) => {
       - National Society of Black Engineers (NSBE):
         - Collaborated with a diverse group of peers on engineering-related initiatives, enhancing teamwork and problem-solving skills.
         - Participated in professional development workshops, gaining industry insights and networking with engineering professionals.
+      
       - Student of Valor (SOV):
         - Christian student organization at UTSA focused on spiritual growth, fellowship, and leadership development. The group meets regularly for Bible studies, worship sessions, and community outreach events, creating a supportive space for students to grow in their faith and live with purpose on campus.
         - Engaged in community service projects, fostering a sense of social responsibility and leadership.
         - Participated in workshops and events focused on personal development and community engagement.
+      
       - Arican Student Association (ASA):
         - Celebrated and promoted African culture through events and activities, enhancing cultural awareness and diversity.
         - Collaborated with peers to organize cultural events, fostering a sense of community and inclusivity.
