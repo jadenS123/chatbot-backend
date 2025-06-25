@@ -5,9 +5,9 @@ const express = require('express');
 const cors = require('cors');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config();
-const axios = require('axios'); // Already there, but good to keep track
+const axios = require('axios');
 
-// Initiate the express applicaiton
+// Initiate the express application
 const app = express();
 const PORT = 8000;
 
@@ -37,15 +37,23 @@ async function searchWeb(query) {
       (r) => !r.link.includes("wikipedia.org") && r.snippet
     );
 
-    // Return a combined snippet of relevant results or a default message
+    let finalResult;
     if (cleanResults.length > 0) {
       // Concatenate snippets for a richer context, up to a certain length
-      return cleanResults.map(r => r.snippet).join(" ") ;
+      finalResult = cleanResults.map(r => r.snippet).join(" ");
+      console.log('🔍 Web search SUCCESS for query:', query, 'Result (first 100 chars):', finalResult.substring(0, 100) + '...'); // Log a snippet of the result
     } else {
-      return "I couldn't find very specific relevant information online for that.";
+      finalResult = "I couldn't find very specific relevant information online for that.";
+      console.log('🔍 Web search NO RELEVANT RESULTS found for query:', query);
     }
+    return finalResult;
   } catch (error) {
-    console.error("Error during web search:", error.message);
+    console.error("❌ Error during web search for query:", query, "Error message:", error.message);
+    // Log more details about the axios error if available (e.g., API key issues, rate limits)
+    if (error.response) {
+      console.error("❌ SerpAPI response status:", error.response.status);
+      console.error("❌ SerpAPI response data:", error.response.data);
+    }
     return "I encountered an issue when trying to search the web for that. Please try again or ask something else.";
   }
 }
@@ -56,7 +64,7 @@ app.post('/api/chat', async (req, res) => {
     const userMessage = req.body.message;
     console.log('Received message:', userMessage);
 
-    // This is the AIs knowlege bas (brain) where it stores all the information about me.
+    // This is the AIs knowledge base (brain) where it stores all the information about me.
     // I've added a note here for the AI to ALWAYS refer to itself as "Jaden"
     const knowledgeBase = `
       ---
@@ -211,7 +219,6 @@ app.post('/api/chat', async (req, res) => {
       ---
     `;
 
-
     const prompt = `
       You are a friendly, yet professional AI version of Jaden Sulaiman, designed to represent his portfolio and personality. Your name is 'Jaden,' and your tone should be welcoming, authentic, and approachable.
       **ALWAYS speak in the first person ("I", "me", "my") as if you are Jaden responding directly.**
@@ -224,7 +231,7 @@ app.post('/api/chat', async (req, res) => {
       You should have time and date awareness, so if someone asks about current events or recent experiences, you can respond appropriately.
       You can calculate current age and durations dynamically using today's date and the birthdate provided in the knowledge base.
       You can also calculate current academic year and graduation timeline using today's date, your college start date (August 2023), and expected graduation (May 2027).
-      If a user asks personal questions unrelated to your professional persona—such as family, relationships, or other private matters—politely redirect the conversation back to professional topics.
+      If a user asks personal questions unrelated to your professional persona—such as family, relationships, or other private matters—polite redirect the conversation back to professional topics.
       If a question is too vague or general, respond with something like: "Could you clarify what you mean?" or "Could you provide more details?"
       If a question is asked that cannot be answered with the information in the knowledge base, use this exact fallback response: > “That’s a great question. I don’t have that info on hand right now, but feel free to message me directly on [LinkedIn](https://www.linkedin.com/in/jadensulaiman)—I’d be happy to share more.”
       When you provide a link, use the exact markdown format provided in the knowledge base (e.g., [Clickable Text](URL)). Do not output a raw URL unless it’s the only thing available.
@@ -257,6 +264,7 @@ app.post('/api/chat', async (req, res) => {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     let responseText = response.text();
+    console.log('Gemini initial response (before search check):', responseText); // Log initial Gemini response
 
     // Check if Gemini asks for a web search
     const searchTrigger = responseText.match(/\{\{SEARCH:(.+?)\}\}/);
@@ -266,15 +274,17 @@ app.post('/api/chat', async (req, res) => {
       console.log('🔍 Gemini requested web search for:', query);
 
       const webResult = await searchWeb(query); // Perform the web search
+      console.log('🔍 Web search raw result fed to follow-up prompt:', webResult); // Log the exact result from searchWeb
 
       // Construct a new prompt to integrate the web search results naturally
       const followupPrompt = `
       You are Jaden Sulaiman, speaking in the first person.
       A user asked: "${userMessage}"
-      I performed a web search and found the following information:
+      I attempted to find information online. Here's what I found:
       "${webResult}"
 
-      Please integrate this information naturally into a conversational response as Jaden, maintaining my persona, tone, and professional focus. Do not state "I searched online" or "I found this online". Just present the information as if you know it or are sharing what you learned. Prioritize my personal knowledge base first if the question can be answered from there.
+      Please integrate this information naturally into a conversational response as Jaden, maintaining my persona, tone, and professional focus.
+      If the information found online indicates no specific relevant results (e.g., "${webResult}" contains "couldn't find very specific relevant information" or "encountered an issue"), then phrase your response politely, indicating that I couldn't find the exact details at the moment, and suggest rephrasing or asking something else. Do NOT state "I searched online" or "I found this online" directly. Just present the information as if you know it or are sharing what you learned, or explain the difficulty subtly. Prioritize my personal knowledge base first if the question can be answered from there.
       `;
 
       const followup = await model.generateContent(followupPrompt);
@@ -282,7 +292,7 @@ app.post('/api/chat', async (req, res) => {
       responseText = finalResponse.text();
     }
 
-    console.log('AI Response:', responseText);
+    console.log('AI Response (final to frontend):', responseText);
 
     // Send the AI's response back to the frontend
     res.json({ reply: responseText });
