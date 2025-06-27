@@ -4,7 +4,8 @@ const express = require('express');
 const cors = require('cors');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config();
-const axios = require('axios');
+// Axios is no longer needed since we removed web search
+// const axios = require('axios'); 
 
 const app = express();
 const PORT = 8000;
@@ -15,23 +16,7 @@ const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 app.use(cors());
 app.use(express.json());
 
-async function searchWeb(query) {
-  const serpUrl = "https://serpapi.com/search";
-  try {
-    const response = await axios.get(serpUrl, {
-      params: { q: query, api_key: process.env.SERP_API_KEY, num: 3 },
-    });
-    const results = response.data.organic_results || [];
-    const cleanResults = results.filter(r => !r.link.includes("wikipedia.org") && r.snippet);
-    if (cleanResults.length > 0) {
-      return cleanResults.map(r => r.snippet).join(" ");
-    }
-    return "I couldn't find specific details about that online.";
-  } catch (error) {
-    console.error("❌ Error during web search:", error.message);
-    return "I ran into an issue trying to search the web.";
-  }
-}
+// The searchWeb function has been completely removed.
 
 app.post('/api/chat', async (req, res) => {
   try {
@@ -42,7 +27,7 @@ app.post('/api/chat', async (req, res) => {
     console.log(`--- New Request ---`);
     console.log('User message:', userMessage);
     
-    // *** YOUR FULL, UNALTERED KNOWLEDGE BASE IS RESTORED HERE ***
+    // Your full, original knowledge base. Untouched.
     const knowledgeBase = `
       ---
       IMPORTANT: ALWAYS refer to yourself as "Jaden" and speak in the first person ("I", "me", "my"). Never say "Jaden's AI Assistant" or refer to yourself as an AI or chatbot.
@@ -195,27 +180,20 @@ app.post('/api/chat', async (req, res) => {
       ---
     `;
 
-    // *** FIX: This prompt structure is robust and API-compliant ***
-    const initialPrompt = `You are Jaden Sulaiman. You MUST speak in the first person ("I", "me", "my").
+    // A simplified and direct prompt focusing only on the knowledge base.
+    const initialPrompt = `You are Jaden Sulaiman. You MUST speak in the first person ("I", "me", "my"). NEVER refer to yourself as an AI, chatbot, or "Jaden's AI Assistant".
+
+    Your one and only task is to answer the user's questions based on the KNOWLEDGE BASE below. Do not use any outside information.
     
-    Your first priority is to determine the user's intent.
-
-    Intent 1: The user is asking for a definition or general information about an organization, company, or university (e.g., "what is ...", "tell me about ...").
-    - If this is the intent, your ONLY response MUST be the string: \`{{SEARCH: [entity name]}}\`.
-    - Example: If the user asks "What is JTF Studios?", you respond ONLY with "{{SEARCH: JTF Studios}}".
-    - Example: If the user asks "What is African Student Association?", you respond ONLY with "{{SEARCH: African Student Association}}".
-
-    Intent 2: The user is asking any other question.
-    - If this is the intent, you MUST answer their question using ONLY the information in the KNOWLEDGE BASE below.
-    - If you cannot find an answer in the KNOWLEDGE BASE, respond with: "That’s a great question. I don’t have that info on hand right now, but feel free to message me directly on [LinkedIn](https://www.linkedin.com/in/jadensulaiman)—I’d be happy to share more."
+    If you cannot find the answer in the KNOWLEDGE BASE, you MUST respond with this exact phrase: "That’s a great question. I don’t have that info on hand right now, but feel free to message me directly on [LinkedIn](https://www.linkedin.com/in/jadensulaiman)—I’d be happy to share more."
 
     KNOWLEDGE BASE:
     ${knowledgeBase}`;
     
-    // FIX: This creates a valid history for the startChat method without using a "system" role.
+    // Create a valid history for the startChat method.
     const chatHistory = [
       { role: "user", parts: [{ text: initialPrompt }] },
-      { role: "model", parts: [{ text: "Understood. I am ready to chat as Jaden Sulaiman." }] },
+      { role: "model", parts: [{ text: "Understood. I am ready to chat as Jaden Sulaiman using only the provided knowledge." }] },
       ...(history || [])
     ];
 
@@ -225,19 +203,7 @@ app.post('/api/chat', async (req, res) => {
     });
 
     const result = await chat.sendMessage(userMessage);
-    let responseText = result.response.text();
-    console.log('Gemini initial response:', responseText);
-
-    const searchTrigger = responseText.match(/\{\{SEARCH:(.+?)\}\}/);
-
-    if (searchTrigger) {
-      const query = searchTrigger[1].trim();
-      console.log('🔍 Gemini requested web search for:', query);
-      const webResult = await searchWeb(query);
-
-      const followupResult = await chat.sendMessage(`Here is what I found about "${query}": ${webResult}. Please use this information to answer the user's original question naturally. Do not mention that you searched for this.`);
-      responseText = followupResult.response.text();
-    }
+    const responseText = result.response.text();
 
     console.log('✅ Final AI Response:', responseText);
     res.json({ reply: responseText });
