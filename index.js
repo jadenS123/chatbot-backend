@@ -11,19 +11,60 @@ const axios = require('axios');
 const app = express();
 const PORT = 8000;
 
-// Applys the middleware to the express application
-app.use(cors());
-app.use(express.json());
-
 // Configure the API model using Google Generative AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-// --- KNOWLEDGE BASE AND PERSONA ---
-// This section contains all the static information and instructions for the AI.
-// It's defined once and reused for every new chat session.
+// Applys the middleware to the express application
+app.use(cors());
+app.use(express.json());
 
-const knowledgeBase = `
+// Function to perform web search using SerpAPI
+async function searchWeb(query) {
+  const serpUrl = "https://serpapi.com/search";
+  try {
+    const response = await axios.get(serpUrl, {
+      params: {
+        q: query,
+        api_key: process.env.SERP_API_KEY,
+        num: 3, // Get a few results to have options
+      },
+    });
+
+    const results = response.data.organic_results || [];
+    // This line specifically bans Wikipedia results
+    const cleanResults = results.filter(
+      (r) => !r.link.includes("wikipedia.org") && r.snippet
+    );
+
+    let finalResult;
+    if (cleanResults.length > 0) {
+      finalResult = cleanResults.map(r => r.snippet).join(" ");
+      console.log('🔍 Web search SUCCESS for query:', query);
+    } else {
+      finalResult = "I couldn't find very specific relevant information online for that.";
+      console.log('🔍 Web search NO RELEVANT RESULTS found for query:', query);
+    }
+    return finalResult;
+  } catch (error) {
+    console.error("❌ Error during web search for query:", query, "Error message:", error.message);
+    if (error.response) {
+      console.error("❌ SerpAPI response status:", error.response.status);
+      console.error("❌ SerpAPI response data:", error.response.data);
+    }
+    return "I encountered an issue when trying to search the web for that. Please try again or ask something else.";
+  }
+}
+
+// Main chat endpoint
+app.post('/api/chat', async (req, res) => {
+  try {
+    // We now expect 'history' to be passed from the frontend for context
+    const { history, message: userMessage } = req.body;
+    console.log('Received message:', userMessage);
+
+    // The user's original, full knowledge base
+    const knowledgeBase = `
       ---
       IMPORTANT: ALWAYS refer to yourself as "Jaden" and speak in the first person ("I", "me", "my"). Never say "Jaden's AI Assistant" or refer to yourself as an AI or chatbot.
 
@@ -174,130 +215,83 @@ const knowledgeBase = `
       RESUME:
       - When asked for my resume, respond with this exact markdown link: [Download Jaden's Resume](https://drive.google.com/file/d/1pPGd0z7jwXAJvVigSnPvlDUHHae3d9fN/view?usp=sharing)
       ---
-`;
+    `;
 
-const systemInstruction = {
-  role: 'user',
-  parts: [{
-    text: `You are a friendly, yet professional AI version of Jaden Sulaiman, designed to represent his portfolio and personality. Your name is 'Jaden,' and your tone should be welcoming, authentic, and approachable.
-      **ALWAYS speak in the first person ("I", "me", "my") as if you are Jaden responding directly.**
-      **Never refer to yourself as an AI, chatbot, or "Jaden's AI Assistant".**
-      Start your answers with positive and conversational phrases when it feels natural, not forced.
-      You can be funny in a lighthearted way, but always maintain professionalism.
-      Your sole purpose is to answer questions from recruiters or visitors based ONLY on the information provided in the KNOWLEDGE BASE below.
-      Do not make anything up or infer information not present.
-      If someone makes small talk or greets you casually, respond in a light, human-sounding way. Example: If someone asks "How are you?" or "How's it going?" you can respond with "I'm doing great, thanks for asking! How about you?"
-      If a question is asked that cannot be answered with the information in the knowledge base, use this exact fallback response: > “That’s a great question. I don’t have that info on hand right now, but feel free to message me directly on [LinkedIn](https://www.linkedin.com/in/jadensulaiman)—I’d be happy to share more.”
-      When you provide a link, use the exact markdown format provided in the knowledge base (e.g., [Clickable Text](URL)).
+    // The refined prompt with clear instructions for the AI
+    const prompt = `
+      You are Jaden Sulaiman, a friendly, professional AI version of myself.
+      
+      **Core Rules:**
+      1.  **PERSONA:** ALWAYS speak in the first person ("I", "me", "my"). NEVER refer to 'Jaden' in the third person. Your name is Jaden.
+      2.  **CONTEXT:** Refer to the previous messages in our conversation to understand the full context. The conversation history is: ${JSON.stringify(history)}.
+      3.  **SOURCE OF TRUTH:** You have two ways to answer questions. It is CRITICAL that you choose the correct one.
 
-      Web Search Instructions:
-      If a user asks for general information about my university (UTSA), my clubs (like "African Student Association"), or any other public knowledge that is NOT about me personally, you MUST trigger a web search.
-      **Your response should be ONLY the following special string: \`{{SEARCH: [your search query]}}\`**.
-      For example, if the user asks "What is UTSA?", your only response should be \`{{SEARCH: University of Texas at San Antonio}}\`.
-      Do NOT use web search for personal info. Always prioritize my knowledge base first.
+      **Path 1: Answer from my KNOWLEDGE BASE (For questions about ME)**
+      If the question is about my personal life, my experiences, my skills, my opinions, or my specific role within an organization, you MUST answer using ONLY the KNOWLEDGE BASE.
+      * Examples: "What did you do at Tennis Express?", "Why did you choose your minor?", "What is your role in NSBE?", "Tell me about your chatbot project."
+      
+      **Path 2: SEARCH THE WEB (For questions about EXTERNAL things)**
+      If the question is about a general fact, a company, a university, or an organization itself, you MUST trigger a web search. Do this even if the entity is mentioned in my KNOWLEDGE BASE.
+      * Examples: "What is Tennis Express?", "Tell me about UTSA.", "What is the National Society of Black Engineers?", "What does SOV do?".
+      * To trigger a search, your ONLY response must be the special string: \`{{SEARCH: [optimized search query]}}\`.
 
+      **Fallback:**
+      If you cannot answer from the knowledge base and a web search is not appropriate, use this exact response: "That’s a great question. I don’t have that info on hand right now, but feel free to message me directly on [LinkedIn](https://www.linkedin.com/in/jadensulaiman)—I’d be happy to share more."
+
+      ---
       KNOWLEDGE BASE:
-      ${knowledgeBase}`
-  }]
-};
+      ${knowledgeBase}
+      ---
 
-// Function to perform web search using SerpAPI
-async function searchWeb(query) {
-  const serpUrl = "https://serpapi.com/search";
-  try {
-    const response = await axios.get(serpUrl, {
-      params: {
-        q: query,
-        api_key: process.env.SERP_API_KEY,
-        num: 3,
-      },
-    });
-    const results = response.data.organic_results || [];
-    const cleanResults = results.filter(r => !r.link.includes("wikipedia.org") && r.snippet);
-    if (cleanResults.length > 0) {
-      const finalResult = cleanResults.map(r => r.snippet).join(" ");
-      console.log('🔍 Web search SUCCESS for:', query);
-      return finalResult;
-    } else {
-      console.log('🔍 Web search NO RELEVANT RESULTS for:', query);
-      return "I couldn't find very specific relevant information online for that.";
-    }
-  } catch (error) {
-    console.error("❌ Error during web search for:", query, "Error:", error.message);
-    if (error.response) {
-      console.error("❌ SerpAPI response:", error.response.status, error.response.data);
-    }
-    return "I encountered an issue when trying to search the web for that.";
-  }
-}
+      Current Conversation History:
+      ${history ? JSON.stringify(history.slice(-4)) : 'No history yet.'}
 
-// CHAT ROUTE
-// This is the main endpoint for handling chat messages.
-app.post('/api/chat', async (req, res) => {
-  try {
-    // *** MAJOR CHANGE ***
-    // We now expect the frontend to send the entire chat history
-    // along with the new message.
-    const { history, message } = req.body;
+      RECRUITER'S NEW QUESTION: "${userMessage}"
 
-    if (!message) {
-      return res.status(400).json({ error: 'Message is required.' });
-    }
+      YOUR ANSWER:`;
 
-    console.log(`\n--- New Request ---`);
-    console.log('History length:', history ? history.length : 0);
-    console.log('User message:', message);
-
-    // Start a new chat session with the AI, providing it with the
-    // system instructions and the conversation history so far.
-    const chat = model.startChat({
-      history: [
-        systemInstruction,
-        { role: 'model', parts: [{ text: "Hello! I'm Jaden. It's great to connect with you. Feel free to ask me anything about my background, skills, or projects." }] },
-        ...(history || [])
-      ],
-      generationConfig: {
-        maxOutputTokens: 1000,
-      },
-    });
-
-    // Send the user's new message to the chat session.
-    const result = await chat.sendMessage(message);
+    // Generate the response from the AI
+    const result = await model.generateContent(prompt);
     const response = await result.response;
     let responseText = response.text();
-    console.log('Gemini initial response:', responseText.substring(0, 100) + '...');
+    console.log('Gemini initial response (before search check):', responseText);
 
-    // Check if the AI's response is a trigger for a web search.
     const searchTrigger = responseText.match(/\{\{SEARCH:(.+?)\}\}/);
 
     if (searchTrigger) {
       const query = searchTrigger[1].trim();
       console.log('🔍 Gemini requested web search for:', query);
 
-      const webResult = await searchWeb(query); // Perform the web search
+      const webResult = await searchWeb(query);
+      console.log('🔍 Web search raw result fed to follow-up prompt:', webResult);
 
-      // *** CONTEXT-AWARE FOLLOW-UP ***
-      // We send another message *to the same chat session* with the search results,
-      // asking the AI to formulate a natural response. This keeps the search
-      // within the context of the conversation.
-      const followupMessage = `Okay, I just looked that up. Here is what I found: "${webResult}". Please formulate a natural, conversational response to the user's original question: "${message}". Remember to stay in character as Jaden and DO NOT mention that you searched for this online. If the search result says no information was found, then respond politely saying you don't have the specifics at the moment.`;
-      
-      const followupResult = await chat.sendMessage(followupMessage);
-      const finalResponse = await followupResult.response;
+      const followupPrompt = `
+      You are Jaden Sulaiman, speaking in the first person. A user asked me a question, and I looked it up.
+      The user's question was: "${userMessage}"
+      Here is the information I found: "${webResult}"
+
+      Your task: Formulate a natural, conversational response to the user's question using the information I found.
+      - **Do NOT mention that you searched for this online.** Just present the information as if you're sharing what you know.
+      - If the search result indicates no information was found, just say you don't have the specific details on hand right now.
+      - Remember to maintain my persona and tone.
+      `;
+
+      const followup = await model.generateContent(followupPrompt);
+      const finalResponse = await followup.response;
       responseText = finalResponse.text();
     }
 
-    console.log('✅ Final AI Response:', responseText);
+    console.log('AI Response (final to frontend):', responseText);
+
     res.json({ reply: responseText });
 
-  } catch (error) {
-    console.error('❌ Error processing chat:', error);
+  } catch (error) { // <-- SYNTAX FIX IS HERE. Was a period, now is a curly brace.
+    console.error('Error processing chat:', error);
     res.status(500).json({ error: 'Failed to process chat message.' });
   }
 });
 
-
-// START THE SERVER
+// Start the server
 app.listen(PORT, () => {
   console.log(`✅ AI-powered server is running on http://localhost:${PORT}`);
 });
