@@ -42,6 +42,7 @@ app.post('/api/chat', async (req, res) => {
     console.log(`--- New Request ---`);
     console.log('User message:', userMessage);
     
+    // *** YOUR FULL, UNALTERED KNOWLEDGE BASE IS RESTORED HERE ***
     const knowledgeBase = `
       ---
       IMPORTANT: ALWAYS refer to yourself as "Jaden" and speak in the first person ("I", "me", "my"). Never say "Jaden's AI Assistant" or refer to yourself as an AI or chatbot.
@@ -194,25 +195,32 @@ app.post('/api/chat', async (req, res) => {
       ---
     `;
 
-    // *** NEW, SIMPLIFIED SYSTEM INSTRUCTION ***
-    const systemInstruction = {
-        role: "system",
-        parts: [{ text: `You are Jaden Sulaiman. You MUST speak in the first person ("I", "me", "my"). 
-        
-        Your first priority is to check if the user is asking for a definition or general information about an organization, company, or university (e.g., "what is ...", "tell me about ...").
-        - IF IT IS a definition request, your ONLY response MUST be the string: \`{{SEARCH: [entity name]}}\`.
-        - EXAMPLES: User asks "What is JTF Studios?", you respond ONLY with "{{SEARCH: JTF Studios}}". User asks "What is African Student Association?", you respond ONLY with "{{SEARCH: African Student Association}}".
-        
-        If the user's message is NOT a definition request, then you MUST answer their question using only the information in the KNOWLEDGE BASE below.
-        
-        If you cannot find an answer in the KNOWLEDGE BASE and it is not a definition request, respond with: "That’s a great question. I don’t have that info on hand right now, but feel free to message me directly on [LinkedIn](https://www.linkedin.com/in/jadensulaiman)—I’d be happy to share more."
-
-        KNOWLEDGE BASE:
-        ${knowledgeBase}`}]
-    };
+    // *** FIX: This prompt structure is robust and API-compliant ***
+    const initialPrompt = `You are Jaden Sulaiman. You MUST speak in the first person ("I", "me", "my").
     
+    Your first priority is to determine the user's intent.
+
+    Intent 1: The user is asking for a definition or general information about an organization, company, or university (e.g., "what is ...", "tell me about ...").
+    - If this is the intent, your ONLY response MUST be the string: \`{{SEARCH: [entity name]}}\`.
+    - Example: If the user asks "What is JTF Studios?", you respond ONLY with "{{SEARCH: JTF Studios}}".
+    - Example: If the user asks "What is African Student Association?", you respond ONLY with "{{SEARCH: African Student Association}}".
+
+    Intent 2: The user is asking any other question.
+    - If this is the intent, you MUST answer their question using ONLY the information in the KNOWLEDGE BASE below.
+    - If you cannot find an answer in the KNOWLEDGE BASE, respond with: "That’s a great question. I don’t have that info on hand right now, but feel free to message me directly on [LinkedIn](https://www.linkedin.com/in/jadensulaiman)—I’d be happy to share more."
+
+    KNOWLEDGE BASE:
+    ${knowledgeBase}`;
+    
+    // FIX: This creates a valid history for the startChat method without using a "system" role.
+    const chatHistory = [
+      { role: "user", parts: [{ text: initialPrompt }] },
+      { role: "model", parts: [{ text: "Understood. I am ready to chat as Jaden Sulaiman." }] },
+      ...(history || [])
+    ];
+
     const chat = model.startChat({
-        history: [systemInstruction, ...(history || [])],
+        history: chatHistory,
         generationConfig: { maxOutputTokens: 1000 },
     });
 
@@ -227,7 +235,7 @@ app.post('/api/chat', async (req, res) => {
       console.log('🔍 Gemini requested web search for:', query);
       const webResult = await searchWeb(query);
 
-      const followupResult = await chat.sendMessage(`Here is the information I found about "${query}": ${webResult}. Please formulate a natural, conversational response to the user's original question. Do not mention that you searched for this.`);
+      const followupResult = await chat.sendMessage(`Here is what I found about "${query}": ${webResult}. Please use this information to answer the user's original question naturally. Do not mention that you searched for this.`);
       responseText = followupResult.response.text();
     }
 
