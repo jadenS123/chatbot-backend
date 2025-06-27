@@ -63,6 +63,9 @@ app.post('/api/chat', async (req, res) => {
       - I have no prior internships or work experience in the field of computer engineering.
       - I want to be given the opportunity to prove myself and showcase my skills in a professional setting in a work environment.
 
+      What are your career goals?
+      - My career goals include becoming a proficient software engineer, specializing in AI and hardware integration, and eventually moving into technology management and leadership roles that can further my career. I also want to work on innovative projects that have a positive impact on society and to continue learning and growing in my field.
+
       Any other degrees your pursuing?
       - I'm going to pursue my MBA after I graduate with my Bachelor's in Computer Engineering.
 
